@@ -50,5 +50,3 @@ def english_to_morse(
     # Join the Morse code words with spaces and write to the output file
     open(output_file, "w").write('\n'.join(morse_words))
     print(f"Converted text to Morse code and saved to {output_file}.")
-
-english_to_morse()
