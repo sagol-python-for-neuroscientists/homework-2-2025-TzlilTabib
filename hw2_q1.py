@@ -24,7 +24,7 @@ MORSE_CODE = {'A': '.-',     'B': '-...',   'C': '-.-.',
 MorseWord = namedtuple("MorseWord", ("morse", "word"))
 
 def is_valid_word(word: str) -> bool:
-    return all(char in MORSE_CODE for char in word)
+    return len(word) > 0 and all(char in MORSE_CODE for char in word)
 
 def word_to_morse(word: str) -> MorseWord:
     """
@@ -44,10 +44,14 @@ def word_to_morse(word: str) -> MorseWord:
         A named tuple containing the Morse code representation of the word and the
         original word.
     """
-    cleaned = ''.join(c for c in word if c in string.printable)
+    # Filter out characters not in the MORSE_CODE dictionary
+    cleaned = ''.join(filter(lambda c: c in MORSE_CODE, word))
+
+    # If the cleaned word is valid, convert it to Morse code
     if is_valid_word(cleaned):
-        morse = ''.join(MORSE_CODE[c] for c in cleaned)
+        morse = ''.join(map(lambda c: MORSE_CODE[c], cleaned))
         return MorseWord(morse, cleaned)
+    # If the cleaned word is not valid, return None
     return None
 
 def english_to_morse(
@@ -76,18 +80,19 @@ def english_to_morse(
         print(f"File {input_file} not found.")
         return
 
-    # Covert text to uppercase and remove newlines
-    text = text.upper().replace("\n", " ")
+    # Covert text to uppercase
+    text = text.upper()
 
-    # Split text into words and remove extra spaces
+    # Split text into words
     words = text.split()
 
     # Convert words to Morse code
-    morse_words = [mw for mw in map(word_to_morse, words) if mw]
+    morse_words = list(filter(None, map(word_to_morse, words)))
 
     # Write to output file
     with open(output_file, "w", newline='\n') as file:
-        file.write('\n'.join(word.morse for word in morse_words) + '\n')
+        for word in morse_words:
+            file.write(f"{word.word} {word.morse}\n")
     
     print(f"Converted text to Morse code and saved to {output_file}.")
 
